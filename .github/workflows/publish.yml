@@ -20,7 +20,7 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v2
         with:
           images: |
-            ghcr.io/vmware-tanzu-labs/namespace-operator
+            ghcr.io/${{ github.repository_owner }}/namespace-operator
           tags: |
             type=ref,event=tag
       - name: Login to Registry
