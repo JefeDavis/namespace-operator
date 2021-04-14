@@ -9,10 +9,31 @@ jobs:
     name: Publish to Registry
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - name: Kaniko build
-        uses: aevea/action-kaniko@master
+      - name: Checkout the Code
+        uses: actions/checkout@v2
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Generate Tag List
+        id: meta
+        uses: crazy-max/ghaction-docker-meta@v2
         with:
-          registry: docker.pkg.github.com
+          images: |
+            ghcr.io/vmware-tanzu-labs/namespace-operator
+          tags: |
+            type=ref,event=tag
+      - name: Login to Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          tag_with_latest: true
+
+      - name: Publish to Registry
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: .
+          tags: |
+            ${{ steps.meta.outputs.tags }}
